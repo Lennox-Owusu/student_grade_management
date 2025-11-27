@@ -3,14 +3,21 @@ public abstract class Student implements Gradable {
 
     private String studentId;
     private String name;
+    private int age;
+    private String email;
+    private String phone;
+
 
     private static final int MAX_GRADES = 50;
     private Grade[] gradeHistory = new Grade[MAX_GRADES];
     private int gradeCount = 0;
 
-    public Student(String name) {
+    public Student(String name, int age, String email, String phone) {
         this.studentId = generateStudentId();
         this.name = name;
+        this.age = age;
+        this.email = email;
+        this.phone = phone;
     }
 
     private String generateStudentId() {
@@ -19,6 +26,9 @@ public abstract class Student implements Gradable {
 
     public String getStudentId() { return studentId; }
     public String getName() { return name; }
+    public int getAge() { return age; }
+    public String getEmail() { return email; }
+    public String getPhone() { return phone; }
 
     // Implementation of Gradable
     @Override
@@ -52,10 +62,4 @@ public abstract class Student implements Gradable {
     public abstract double getPassingGrade();
     public abstract String getStudentType();
 
-    @Override
-    public String toString() {
-        return String.format("%s | %s | %s | Avg: %.1f%% | %s | Enrolled: %d | Passing Grade: %.0f%%",
-                studentId, name, getStudentType(), calculateAverage(),
-                (isPassing() ? "Passing" : "Failing"), gradeCount, getPassingGrade());
-    }
 }
