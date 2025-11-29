@@ -1,27 +1,62 @@
-public abstract class Student implements Gradable {
-    private static int studentCounter = 1;   // static ID generator
 
+import java.util.HashSet;
+import java.util.Set;
+
+public abstract class Student {
     private String studentId;
     private String name;
     private int age;
     private String email;
     private String phone;
+    private String status;
 
+    protected double[] grades;
+    protected int gradeCount;
 
-    private static final int MAX_GRADES = 50;
-    private Grade[] gradeHistory = new Grade[MAX_GRADES];
-    private int gradeCount = 0;
+    private Set<String> enrolledSubjectCodes = new HashSet<>();
+
+    private static int studentCounter = 0;
 
     public Student(String name, int age, String email, String phone) {
-        this.studentId = generateStudentId();
+        this.studentId = String.format("STU%03d", ++studentCounter);
         this.name = name;
         this.age = age;
         this.email = email;
         this.phone = phone;
+        this.status = "Active";
+        this.grades = new double[50];
+        this.gradeCount = 0;
     }
 
-    private String generateStudentId() {
-        return String.format("STU%03d", studentCounter++);
+    public abstract void displayStudentDetails();
+    public abstract String getStudentType();
+    public abstract double getPassingGrade();
+
+    public void addGrade(double grade) {
+        if (gradeCount < grades.length) {
+            grades[gradeCount++] = grade;
+        }
+    }
+
+    public double calculateAverageGrade() {
+        if (gradeCount == 0) return 0.0;
+        double sum = 0;
+        for (int i = 0; i < gradeCount; i++) sum += grades[i];
+        return sum / gradeCount;
+    }
+
+    public boolean isPassing() {
+        return calculateAverageGrade() >= getPassingGrade();
+    }
+
+    public void enrollSubject(Subject subject) {
+        if (subject != null) {
+            enrolledSubjectCodes.add(subject.getSubjectCode());
+        }
+    }
+
+    public int getEnrolledSubjectCount() {
+        return enrolledSubjectCodes.size();
     }
 
     public String getStudentId() { return studentId; }
@@ -29,37 +64,5 @@ public abstract class Student implements Gradable {
     public int getAge() { return age; }
     public String getEmail() { return email; }
     public String getPhone() { return phone; }
-
-    // Implementation of Gradable
-    @Override
-    public void recordGrade(Grade grade) {
-        if (gradeCount < gradeHistory.length) {
-            gradeHistory[gradeCount++] = grade;
-        } else {
-            System.out.println("Grade storage full for student " + studentId);
-        }
-    }
-
-    public Grade[] getGradeHistory() {
-        Grade[] copy = new Grade[gradeCount];
-        for (int i = 0; i < gradeCount; i++) copy[i] = gradeHistory[i];
-        return copy;
-    }
-
-    public int getGradeCount() { return gradeCount; }
-
-    public double calculateAverage() {
-        if (gradeCount == 0) return 0.0;
-        double sum = 0;
-        for (int i = 0; i < gradeCount; i++) sum += gradeHistory[i].getScore();
-        return Math.round((sum / gradeCount) * 10.0) / 10.0;
-    }
-
-    public boolean isPassing() {
-        return calculateAverage() >= getPassingGrade();
-    }
-
-    public abstract double getPassingGrade();
-    public abstract String getStudentType();
-
+    public String getStatus() { return status; }
 }

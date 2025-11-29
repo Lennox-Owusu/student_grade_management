@@ -1,11 +1,22 @@
+
 public class CoreSubject extends Subject {
-    public CoreSubject(String code, String name) {
-        super(code, name);
+    private final boolean mandatory = true;
+
+    public CoreSubject(String subjectName, String subjectCode) {
+        super(subjectName, subjectCode);
     }
 
     @Override
-    public String getCategory() {
+    public void displaySubjectDetails() {
+        System.out.println("Core Subject: " + getSubjectName() + " (" + getSubjectCode() + ")");
+    }
+
+    @Override
+    public String getSubjectType() {
         return "Core";
     }
-}
 
+    public boolean isMandatory() {
+        return mandatory;
+    }
+}

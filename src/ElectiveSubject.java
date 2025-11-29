@@ -1,11 +1,22 @@
+
 public class ElectiveSubject extends Subject {
-    public ElectiveSubject(String code, String name) {
-        super(code, name);
+    private final boolean mandatory = false;
+
+    public ElectiveSubject(String subjectName, String subjectCode) {
+        super(subjectName, subjectCode);
     }
 
     @Override
-    public String getCategory() {
+    public void displaySubjectDetails() {
+        System.out.println("Elective Subject: " + getSubjectName() + " (" + getSubjectCode() + ")");
+    }
+
+    @Override
+    public String getSubjectType() {
         return "Elective";
     }
-}
 
+    public boolean isMandatory() {
+        return mandatory;
+    }
+}

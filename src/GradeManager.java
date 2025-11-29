@@ -1,2 +1,71 @@
+
 public class GradeManager {
+    private Grade[] grades;
+    private int gradeCount;
+
+    public GradeManager(int size) {
+        grades = new Grade[size];
+        gradeCount = 0;
+    }
+
+    public void addGrade(Grade grade) {
+        if (gradeCount < grades.length) {
+            grades[gradeCount++] = grade;
+        }
+    }
+
+
+    public Grade getGradeAt(int index) {
+        if (index < 0 || index >= gradeCount) return null;
+        return grades[index];
+    }
+
+
+    public void viewGradesByStudent(String studentId) {
+        System.out.println("Grades for Student ID: " + studentId);
+        for (int i = gradeCount - 1; i >= 0; i--) { // Reverse order
+            if (grades[i].getStudentId().equalsIgnoreCase(studentId)) {
+                grades[i].displayGradeDetails();
+            }
+        }
+    }
+
+    public double calculateCoreAverage(String studentId) {
+        double sum = 0; int count = 0;
+        for (int i = 0; i < gradeCount; i++) {
+            if (grades[i].getStudentId().equalsIgnoreCase(studentId) &&
+                    grades[i].getSubject().getSubjectType().equals("Core")) {
+                sum += grades[i].getGrade();
+                count++;
+            }
+        }
+        return count == 0 ? 0.0 : sum / count;
+    }
+
+    public double calculateElectiveAverage(String studentId) {
+        double sum = 0; int count = 0;
+        for (int i = 0; i < gradeCount; i++) {
+            if (grades[i].getStudentId().equalsIgnoreCase(studentId) &&
+                    grades[i].getSubject().getSubjectType().equals("Elective")) {
+                sum += grades[i].getGrade();
+                count++;
+            }
+        }
+        return count == 0 ? 0.0 : sum / count;
+    }
+
+    public double calculateOverallAverage(String studentId) {
+        double sum = 0; int count = 0;
+        for (int i = 0; i < gradeCount; i++) {
+            if (grades[i].getStudentId().equalsIgnoreCase(studentId)) {
+                sum += grades[i].getGrade();
+                count++;
+            }
+        }
+        return count == 0 ? 0.0 : sum / count;
+    }
+
+    public int getGradeCount() {
+        return gradeCount;
+    }
 }
