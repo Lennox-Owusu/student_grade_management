@@ -1,6 +1,6 @@
 
 public class GradeManager {
-    private Grade[] grades;
+    private final Grade[] grades;
     private int gradeCount;
 
     public GradeManager(int size) {
@@ -20,15 +20,6 @@ public class GradeManager {
         return grades[index];
     }
 
-
-    public void viewGradesByStudent(String studentId) {
-        System.out.println("Grades for Student ID: " + studentId);
-        for (int i = gradeCount - 1; i >= 0; i--) { // Reverse order
-            if (grades[i].getStudentId().equalsIgnoreCase(studentId)) {
-                grades[i].displayGradeDetails();
-            }
-        }
-    }
 
     public double calculateCoreAverage(String studentId) {
         double sum = 0; int count = 0;
