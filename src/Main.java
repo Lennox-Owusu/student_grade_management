@@ -83,8 +83,7 @@ public class Main {
         }
 
         studentManager.addStudent(student);
-
-        // ✅ Confirmation block based on type
+        //  Confirmation block based on type of student
         System.out.println("\nStudent added successfully!");
         System.out.println("Student ID: " + student.getStudentId());
         System.out.println("Name: " + student.getName());
@@ -100,7 +99,6 @@ public class Main {
 
         System.out.println("Status: Active");
 
-        // ✅ Pause before returning to menu
         System.out.print("\nPress Enter to continue...");
         scanner.nextLine();
     }
@@ -120,7 +118,7 @@ public class Main {
 
         for (Student s : studentManager.getStudents()) {
             System.out.printf("%-8s | %-18s | %-8s | %-10.2f | %-8s%n",
-                    s.getStudentId(), truncateName(s.getName(), 18), s.getStudentType(),
+                    s.getStudentId(), truncateName(s.getName()), s.getStudentType(),
                     s.calculateAverageGrade(), (s.isPassing() ? "Passing" : "Failing"));
 
             if ("Honors".equals(s.getStudentType())) {
@@ -137,14 +135,14 @@ public class Main {
         System.out.println("Total Students: " + studentManager.getStudentCount());
         System.out.printf("Average Class Grade: %.2f%n", studentManager.getAverageClassGrade());
 
-        // ✅ Pause before returning to menu
+
         System.out.print("\nPress Enter to continue...");
         new Scanner(System.in).nextLine();
     }
 
     // Helper to truncate long names
-    private static String truncateName(String name, int maxLength) {
-        return name.length() > maxLength ? name.substring(0, maxLength - 3) + "..." : name;
+    private static String truncateName(String name) {
+        return name.length() > 18 ? name.substring(0, 18 - 3) + "..." : name;
 
 
     }
@@ -165,14 +163,14 @@ public class Main {
             return;
         }
 
-        // ✅ Show student details before proceeding
+        // Show student details before proceeding
         System.out.println("\nStudent Details:");
         System.out.println("Name: " + student.getName());
         System.out.println("Type: " + student.getStudentType());
         System.out.printf("Current Average: %.2f%n", student.calculateAverageGrade());
         System.out.println("----------------------------------------");
 
-        // ✅ Subject type selection
+        // Subject type selection
         System.out.println("\nSubject type:");
         System.out.println("1. Core Subject (Mathematics, English, Science)");
         System.out.println("2. Elective Subject (Music, Art, Physical Education");
@@ -187,7 +185,7 @@ public class Main {
             return;
         }
 
-        // ✅ Show available subjects based on type
+        // Show available subjects based on type
         String[] coreSubjects = {"Mathematics", "English", "Science"};
         String[] electiveSubjects = {"Music", "Art", "Physical Education"};
         Subject subject = null;
@@ -229,7 +227,7 @@ public class Main {
             return;
         }
 
-        // ✅ Enter grade
+        // Enter grade
         System.out.print("Enter grade (0-100): ");
         double gradeValue;
         try {
@@ -248,10 +246,10 @@ public class Main {
             return;
         }
 
-        // ✅ Prepare grade for confirmation
+        //Prepare grade for confirmation
         Grade grade = new Grade(studentId, subject, gradeValue);
 
-        // ✅ Show confirmation block
+        //Show confirmation block
         System.out.println("\nGRADE CONFIRMATION");
         System.out.println("----------------------------------------");
         System.out.println("Grade ID: " + grade.getGradeId());
@@ -295,14 +293,14 @@ public class Main {
             return;
         }
 
-        // ✅ Show student details
+        //Show student details
         System.out.println("\nStudent: " + student.getStudentId() + " - " + student.getName());
         System.out.println("Type: " + student.getStudentType());
         System.out.printf("Current Average: %.2f%n", student.calculateAverageGrade());
         System.out.println("Status: " + (student.isPassing() ? "Passing" : "Failing"));
         System.out.println("----------------------------------------");
 
-        // ✅ Check if student has any grades
+        //Check if student has any grades
         boolean hasGrades = false;
         int totalGrades = 0;
         for (int i = 0; i < gradeManager.getGradeCount(); i++) {
@@ -322,7 +320,7 @@ public class Main {
             return;
         }
 
-        // ✅ Show grade history table
+        //Show grade history table
         System.out.println("\nGRADE HISTORY");
         System.out.printf("%-8s | %-10s | %-20s | %-8s | %-7s%n",
                 "GRD ID", "DATE", "SUBJECT", "TYPE", "GRADE");
@@ -343,7 +341,7 @@ public class Main {
         System.out.printf("Elective Subjects Average: %.2f%n", gradeManager.calculateElectiveAverage(studentId));
         System.out.printf("Overall Average: %.2f%n", gradeManager.calculateOverallAverage(studentId));
 
-        // ✅ Performance Summary
+        //Performance Summary
         System.out.println("\nPerformance Summary:");
         System.out.println("Passing all core subjects");
         System.out.printf("Meeting passing grade requirement (%.0f%%)%n", student.getPassingGrade());

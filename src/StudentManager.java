@@ -1,6 +1,6 @@
 
 public class StudentManager {
-    private Student[] students;
+    private final Student[] students;
     private int studentCount;
 
     public StudentManager(int size) {
@@ -25,11 +25,6 @@ public class StudentManager {
         return null;
     }
 
-    public Student getStudent(int index) {
-        if (index < 0 || index >= studentCount) return null;
-        return students[index];
-    }
-
     public Student[] getStudents() {
         Student[] copy = new Student[studentCount];
         for (int i = 0; i < studentCount; i++) copy[i] = students[i];
@@ -47,12 +42,4 @@ public class StudentManager {
         return sum / studentCount;
     }
 
-    public void viewAllStudents() {
-        System.out.println("\nSTUDENT LISTING\n");
-        for (int i = 0; i < studentCount; i++) {
-            students[i].displayStudentDetails();
-        }
-        System.out.println("Total Students: " + studentCount);
-        System.out.printf("Average Class Grade: %.2f%n", getAverageClassGrade());
-    }
 }

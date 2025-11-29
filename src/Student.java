@@ -3,17 +3,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class Student {
-    private String studentId;
-    private String name;
-    private int age;
-    private String email;
-    private String phone;
-    private String status;
+    private final String studentId;
+    private final String name;
+    private final int age;
+    private final String email;
+    private final String phone;
+    private final String status;
 
     protected double[] grades;
     protected int gradeCount;
 
-    private Set<String> enrolledSubjectCodes = new HashSet<>();
+    private final Set<String> enrolledSubjectCodes = new HashSet<>();
 
     private static int studentCounter = 0;
 

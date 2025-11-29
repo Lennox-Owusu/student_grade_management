@@ -1,7 +1,7 @@
 
 public abstract class Subject {
-    private String subjectName;
-    private String subjectCode;
+    private final String subjectName;
+    private final String subjectCode;
 
     public Subject(String subjectName, String subjectCode) {
         this.subjectName = subjectName;
