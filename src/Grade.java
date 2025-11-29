@@ -3,11 +3,11 @@ import java.time.LocalDate;
 
 public class Grade {
     private static int gradeCounter = 0;
-    private String gradeId;
-    private String studentId;
-    private Subject subject;
-    private double grade;
-    private String date;
+    private final String gradeId;
+    private final String studentId;
+    private final Subject subject;
+    private final double grade;
+    private final String date;
 
     public Grade(String studentId, Subject subject, double grade) {
         this.gradeId = "GRD" + (++gradeCounter);
