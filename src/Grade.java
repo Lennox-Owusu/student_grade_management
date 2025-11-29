@@ -23,14 +23,6 @@ public class Grade {
                 ", Grade: " + grade + ", Date: " + date);
     }
 
-    public String getLetterGrade() {
-        if (grade >= 90) return "A";
-        else if (grade >= 80) return "B";
-        else if (grade >= 70) return "C";
-        else if (grade >= 60) return "D";
-        else return "F";
-    }
-
     // Getters
     public String getGradeId() { return gradeId; }
     public String getStudentId() { return studentId; }
