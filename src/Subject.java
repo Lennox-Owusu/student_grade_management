@@ -8,7 +8,6 @@ public abstract class Subject {
         this.subjectCode = subjectCode;
     }
 
-    public abstract void displaySubjectDetails();
     public abstract String getSubjectType();
 
     public String getSubjectName() { return subjectName; }

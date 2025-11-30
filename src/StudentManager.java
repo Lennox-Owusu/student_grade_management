@@ -1,8 +1,12 @@
 
+
+//Manages a collection of Student objects and provides methods for searching and calculating averages.
 public class StudentManager {
     private final Student[] students;
     private int studentCount;
 
+
+     //Initializes the manager with a fixed-size array
     public StudentManager(int size) {
         students = new Student[size];
         studentCount = 0;

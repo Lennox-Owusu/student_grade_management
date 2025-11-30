@@ -261,14 +261,20 @@ public class Main {
         System.out.print("Confirm grade? (Y/N): ");
         String confirm = scanner.nextLine().trim().toUpperCase();
 
+
         if (confirm.equals("Y")) {
             gradeManager.addGrade(grade);
-            student.addGrade(gradeValue);
-            student.enrollSubject(subject);
-            System.out.println("\nGrade recorded successfully!");
+            boolean ok = student.recordGrade(gradeValue); // Use interface method
+            if (!ok) {
+                System.out.println("Grade could not be recorded (invalid or full).");
+            } else {
+                student.enrollSubject(subject);
+                System.out.println("\nGrade recorded successfully!");
+            }
         } else {
             System.out.println("\nGrade entry canceled.");
         }
+
 
         System.out.print("\nPress Enter to continue...");
         scanner.nextLine();

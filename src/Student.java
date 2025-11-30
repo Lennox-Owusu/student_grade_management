@@ -2,40 +2,47 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class Student {
+//Abstract base class representing a student with personal details and academic records.
+public abstract class Student implements Gradable {
     private final String studentId;
     private final String name;
     private final int age;
     private final String email;
-    private final String phone;
-    private final String status;
 
     protected double[] grades;
     protected int gradeCount;
 
     private final Set<String> enrolledSubjectCodes = new HashSet<>();
-
     private static int studentCounter = 0;
 
+    //Constructs a student with personal details and initializes grade storage.
     public Student(String name, int age, String email, String phone) {
         this.studentId = String.format("STU%03d", ++studentCounter);
         this.name = name;
         this.age = age;
         this.email = email;
-        this.phone = phone;
-        this.status = "Active";
         this.grades = new double[50];
         this.gradeCount = 0;
     }
 
-    public abstract void displayStudentDetails();
     public abstract String getStudentType();
     public abstract double getPassingGrade();
 
-    public void addGrade(double grade) {
-        if (gradeCount < grades.length) {
-            grades[gradeCount++] = grade;
+    // Implement Gradable interface
+    @Override
+    public boolean recordGrade(double grade) {
+        if (validateGrade(grade)) {
+            if (gradeCount < grades.length) {
+                grades[gradeCount++] = grade;
+                return true;
+            }
         }
+        return false;
+    }
+
+    @Override
+    public boolean validateGrade(double grade) {
+        return grade >= 0 && grade <= 100;
     }
 
     public double calculateAverageGrade() {
@@ -59,10 +66,10 @@ public abstract class Student {
         return enrolledSubjectCodes.size();
     }
 
+    // Getters
     public String getStudentId() { return studentId; }
     public String getName() { return name; }
     public int getAge() { return age; }
     public String getEmail() { return email; }
-    public String getPhone() { return phone; }
-    public String getStatus() { return status; }
+
 }
