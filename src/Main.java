@@ -11,9 +11,12 @@ public class Main {
 
         boolean exit = false;
         while (!exit) {
-            System.out.println("\n======================================");
-            System.out.println("STUDENT GRADE MANAGEMENT - MAIN MENU");
-            System.out.println("======================================");
+
+            System.out.println("\n" +
+                    "╔" + "═".repeat(38) + "╗");
+            System.out.println("║ STUDENT GRADE MANAGEMENT - MAIN MENU ║");
+            System.out.println("╚" + "═".repeat(38) + "╝");
+
             System.out.println("\n1. Add Student");
             System.out.println("2. View Students");
             System.out.println("3. Record Grade");
@@ -56,7 +59,7 @@ public class Main {
 
     private static void addStudent(Scanner scanner, StudentManager studentManager) {
         System.out.println("\nADD STUDENT");
-        System.out.println("----------------------------------------");
+        System.out.println("─".repeat(40));
         System.out.print("Enter student name: ");
         String name = scanner.nextLine();
         System.out.print("Enter student age: ");
@@ -111,13 +114,13 @@ public class Main {
         }
 
         System.out.println("\nSTUDENT LISTING");
-        System.out.println("--------------------------------------------------------------------------");
+        System.out.println("─".repeat(70));
         System.out.printf("%-8s | %-18s | %-8s | %-10s | %-8s%n",
                 "STU ID", "NAME", "TYPE", "AVG GRADE", "STATUS");
-        System.out.println("--------------------------------------------------------------------------");
+        System.out.println("─".repeat(70));
 
         for (Student s : studentManager.getStudents()) {
-            System.out.printf("%-8s | %-18s | %-8s | %-10.2f | %-8s%n",
+            System.out.printf("%-8s │ %-18s │ %-8s │ %-10.2f │ %-8s%n",
                     s.getStudentId(), truncateName(s.getName()), s.getStudentType(),
                     s.calculateAverageGrade(), (s.isPassing() ? "Passing" : "Failing"));
 
@@ -129,7 +132,7 @@ public class Main {
                 System.out.printf("     Enrolled Subjects: %d | Passing Grade: %.0f%%%n",
                         s.getEnrolledSubjectCount(), s.getPassingGrade());
             }
-            System.out.println("--------------------------------------------------------------------------");
+            System.out.println("─".repeat(70));
         }
 
         System.out.println("Total Students: " + studentManager.getStudentCount());
@@ -150,7 +153,7 @@ public class Main {
 
     private static void recordGrade(Scanner scanner, StudentManager studentManager, GradeManager gradeManager) {
         System.out.println("\nRECORD GRADE");
-        System.out.println("----------------------------------------");
+        System.out.println("─".repeat(40));
         System.out.print("\nEnter Student ID: ");
         String inputId = scanner.nextLine().trim();
         String studentId = inputId.toUpperCase();
@@ -168,8 +171,7 @@ public class Main {
         System.out.println("Name: " + student.getName());
         System.out.println("Type: " + student.getStudentType());
         System.out.printf("Current Average: %.2f%n", student.calculateAverageGrade());
-        System.out.println("----------------------------------------");
-
+        System.out.println("─".repeat(40));
         // Subject type selection
         System.out.println("\nSubject type:");
         System.out.println("1. Core Subject (Mathematics, English, Science)");
@@ -251,13 +253,13 @@ public class Main {
 
         //Show confirmation block
         System.out.println("\nGRADE CONFIRMATION");
-        System.out.println("----------------------------------------");
+        System.out.println("─".repeat(70));
         System.out.println("Grade ID: " + grade.getGradeId());
         System.out.println("Student: " + student.getStudentId() + " - " + student.getName());
         System.out.println("Subject: " + subject.getSubjectName() + " (" + subject.getSubjectType() + ")");
         System.out.printf("Grade: %.2f%n", gradeValue);
         System.out.println("Date: " + grade.getDate());
-        System.out.println("----------------------------------------");
+        System.out.println("─".repeat(70));
         System.out.print("Confirm grade? (Y/N): ");
         String confirm = scanner.nextLine().trim().toUpperCase();
 
@@ -286,7 +288,7 @@ public class Main {
 
     private static void viewGradeReport(Scanner scanner, StudentManager studentManager, GradeManager gradeManager) {
         System.out.println("\nVIEW GRADE REPORT");
-        System.out.println("----------------------------------------");
+        System.out.println("─".repeat(50));
         System.out.print("Enter Student ID: ");
         String inputId = scanner.nextLine().trim();
         String studentId = inputId.toUpperCase();
@@ -304,7 +306,7 @@ public class Main {
         System.out.println("Type: " + student.getStudentType());
         System.out.printf("Current Average: %.2f%n", student.calculateAverageGrade());
         System.out.println("Status: " + (student.isPassing() ? "Passing" : "Failing"));
-        System.out.println("----------------------------------------");
+        System.out.println("─".repeat(50));
 
         //Check if student has any grades
         boolean hasGrades = false;
@@ -318,9 +320,8 @@ public class Main {
         }
 
         if (!hasGrades) {
-            System.out.println("----------------------------------------");
             System.out.println("No grades recorded for this student");
-            System.out.println("----------------------------------------");
+            System.out.println("─".repeat(50));
             System.out.print("\nPress Enter to continue...");
             scanner.nextLine();
             return;
@@ -328,20 +329,21 @@ public class Main {
 
         //Show grade history table
         System.out.println("\nGRADE HISTORY");
-        System.out.printf("%-8s | %-10s | %-20s | %-8s | %-7s%n",
+        System.out.printf("%-8s │ %-10s │ %-20s │ %-8s │ %-7s%n",
                 "GRD ID", "DATE", "SUBJECT", "TYPE", "GRADE");
-        System.out.println("--------------------------------------------------------------------------");
+
+        System.out.println("─".repeat(70));
 
         for (int i = gradeManager.getGradeCount() - 1; i >= 0; i--) {
             Grade g = gradeManager.getGradeAt(i);
             if (g != null && g.getStudentId().equalsIgnoreCase(studentId)) {
-                System.out.printf("%-8s | %-10s | %-20s | %-8s | %-7.2f%n",
+                System.out.printf("%-8s │ %-10s │ %-20s │ %-8s │ %-7s%n",
                         g.getGradeId(), g.getDate(), g.getSubject().getSubjectName(),
                         g.getSubject().getSubjectType(), g.getGrade());
             }
         }
 
-        System.out.println("--------------------------------------------------------------------------");
+        System.out.println("─".repeat(70));
         System.out.println("Total Grades: " + totalGrades);
         System.out.printf("Core Subjects Average: %.2f%n", gradeManager.calculateCoreAverage(studentId));
         System.out.printf("Elective Subjects Average: %.2f%n", gradeManager.calculateElectiveAverage(studentId));
