@@ -1,6 +1,5 @@
 //Represents an elective (non-mandatory) subject a student may choose.
 public class ElectiveSubject extends Subject {
-    private final boolean mandatory = false;
 
 
     //Constructs an elective subject with a name and code.
@@ -15,7 +14,4 @@ public class ElectiveSubject extends Subject {
         return "Elective";
     }
 
-    public boolean isMandatory() {
-        return mandatory;
-    }
 }
