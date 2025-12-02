@@ -1,6 +1,5 @@
 
-
-//Manages a collection of Student objects and provides methods for searching and calculating averages.
+//Manages a collection of Student objects
 public class StudentManager {
     private final Student[] students;
     private int studentCount;
