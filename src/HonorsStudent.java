@@ -1,8 +1,6 @@
 
 //Represents an honors student with additional eligibility checks.
 public class HonorsStudent extends Student {
-    private final double passingGrade = 60.0;
-
 
     //Constructs an honors student with personal details.
     public HonorsStudent(String name, int age, String email, String phone) {
@@ -16,7 +14,8 @@ public class HonorsStudent extends Student {
 
     //return the passing grade threshold for honors students (60%)
     @Override
-    public double getPassingGrade() { return passingGrade; }
+    public double getPassingGrade() {
+        return 60.0; }
 
 
     //return true if average grade >= 85

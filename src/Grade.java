@@ -2,7 +2,6 @@
 import java.time.LocalDate;
 
  //Represents a grade record for a student in a specific subject.
- //Includes unique ID, student ID, subject details, grade value, and date.
 public class Grade {
     private static int gradeCounter = 0;
     private final String gradeId;
