@@ -7,6 +7,7 @@ public class CoreSubject extends Subject {
 
     @Override
     public String getSubjectType() {
+
         return "Core";
     }
 
