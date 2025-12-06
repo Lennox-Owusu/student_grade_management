@@ -8,7 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.io.BufferedReader;
 import java.util.Scanner;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -27,8 +32,11 @@ public class Main {
             System.out.println("3. Record Grade");
             System.out.println("4. View Grade Report");
             System.out.println("5. Export Grade Report");
-            System.out.println("6. Calculate Student GPA"); // NEW
-            System.out.println("7. Exit"); // Exit last
+            System.out.println("6. Calculate Student GPA");
+            System.out.println("7. Bulk Import Grades");
+            System.out.println("8. View Class Statistics");
+            System.out.println("9. Search Students");
+            System.out.println("10. Exit");
             System.out.print("\nEnter choice: ");
             int choice;
             try {
@@ -37,20 +45,23 @@ public class Main {
                 System.out.println("Invalid input. Please enter a number.");
                 continue;
             }
+
+
             switch (choice) {
                 case 1 -> addStudent(scanner, studentManager);
                 case 2 -> viewStudents(studentManager);
                 case 3 -> recordGrade(scanner, studentManager, gradeManager);
                 case 4 -> viewGradeReport(scanner, studentManager, gradeManager);
                 case 5 -> exportGradeReport(scanner, studentManager, gradeManager);
-                case 6 -> calculateStudentGPA(scanner, studentManager, gradeManager); // NEW
-                case 7 -> {
-                    System.out.println("Thank you for using Grade Management System!");
-                    System.out.println("Goodbye!");
-                    exit = true;
-                }
-                default -> System.out.println("Invalid choice. Please select between 1-7.");
+                case 6 -> calculateStudentGPA(scanner, studentManager, gradeManager);
+                case 7 -> bulkImportGrades(scanner, studentManager, gradeManager);
+                case 8 -> viewClassStatistics(scanner, studentManager, gradeManager);
+                case 9 -> searchStudents(scanner, studentManager, gradeManager);
+                case 10 -> { System.out.println("Thank you for using Grade Management System!");
+                    System.out.println("Goodbye!"); exit = true; }
+                default -> System.out.println("Invalid choice. Please select between 1-9.");
             }
+
         }
         scanner.close();
     }
@@ -139,27 +150,51 @@ public class Main {
         return name.length() > 18 ? name.substring(0, 18 - 3) + "..." : name;
     }
 
+
     private static void recordGrade(Scanner scanner, StudentManager studentManager, GradeManager gradeManager) {
         System.out.println("\nRECORD GRADE");
         System.out.println("─".repeat(40));
-        System.out.print("\nEnter Student ID: ");
-        String inputId = scanner.nextLine().trim();
-        String studentId = inputId.toUpperCase();
-        Student student = studentManager.findStudent(studentId);
-        if (student == null) {
-            System.out.println("Student not found!");
-            System.out.print("\nPress Enter to continue...");
-            scanner.nextLine();
-            return;
+
+        // ----- 1) Prompt for student ID with exception flow -----
+        Student student = null;
+        Subject subject;
+        while (true) {
+            System.out.print("\nEnter Student ID: ");
+            String inputId = scanner.nextLine().trim();
+            String studentId = inputId.toUpperCase();
+
+            try {
+                student = studentManager.findStudent(studentId);
+                if (student == null) throw new StudentNotFoundException(studentId);
+                // Found -> proceed
+                // Show student details (like your previous version)
+                System.out.println("\nStudent Details:");
+                System.out.println("Name: " + student.getName());
+                System.out.println("Type: " + student.getStudentType());
+                System.out.printf("Current Average: %.2f%n", student.calculateAverageGrade());
+                break; // exit the "find student" loop
+            } catch (StudentNotFoundException snfe) {
+                System.out.println("\n✗ ERROR: StudentNotFoundException");
+                System.out.println("  " + snfe.getMessage());
+                System.out.println();
+                // Show available IDs on one line, comma separated
+                Student[] all = studentManager.getStudents();
+                StringBuilder ids = new StringBuilder("  Available student IDs: ");
+                for (int i = 0; i < all.length; i++) {
+                    ids.append(all[i].getStudentId());
+                    if (i < all.length - 1) ids.append(", ");
+                }
+                System.out.println(ids);
+                System.out.print("\nTry again? (Y/N): ");
+                String retry = scanner.nextLine().trim().toUpperCase();
+                if (!"Y".equals(retry)) return; // back to main menu
+            }
         }
-        System.out.println("\nStudent Details:");
-        System.out.println("Name: " + student.getName());
-        System.out.println("Type: " + student.getStudentType());
-        System.out.printf("Current Average: %.2f%n", student.calculateAverageGrade());
-        System.out.println("─".repeat(40));
+
+        // ----- 2) Subject type & picking (exactly like your current UI) -----
         System.out.println("\nSubject type:");
         System.out.println("1. Core Subject (Mathematics, English, Science)");
-        System.out.println("2. Elective Subject (Music, Art, Physical Education)");
+        System.out.println("2. Elective Subject (Music, Art ,Physical Education)");
         System.out.print("\nSelect type (1-2): ");
         int subjectType;
         try {
@@ -170,9 +205,10 @@ public class Main {
             scanner.nextLine();
             return;
         }
+
         String[] coreSubjects = {"Mathematics", "English", "Science"};
         String[] electiveSubjects = {"Music", "Art", "Physical Education"};
-        Subject subject = null;
+
         if (subjectType == 1) {
             System.out.println("\nAvailable Core Subjects:");
             for (int i = 0; i < coreSubjects.length; i++) {
@@ -209,23 +245,37 @@ public class Main {
             scanner.nextLine();
             return;
         }
-        System.out.print("Enter grade (0-100): ");
+
+        // ----- 3) Enter grade with exception flow and retry -----
         double gradeValue;
-        try {
-            gradeValue = Double.parseDouble(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid grade. Must be a number between 0 and 100.");
-            System.out.print("\nPress Enter to continue...");
-            scanner.nextLine();
-            return;
+        while (true) {
+            System.out.print("\nEnter grade (0-100): ");
+            String gradeStr = scanner.nextLine().trim();
+            try {
+                double g = Double.parseDouble(gradeStr);
+                if (g < 0 || g > 100) throw new InvalidGradeException(g);
+                gradeValue = g;
+                break; // valid -> proceed to confirmation
+            } catch (NumberFormatException nfe) {
+                System.out.println("\n✗ ERROR: NumberFormatException");
+                System.out.println("  Grade must be a number between 0 and 100.");
+                System.out.println("  You entered: " + gradeStr);
+                System.out.print("\nTry again? (Y/N): ");
+                String retry = scanner.nextLine().trim().toUpperCase();
+                if (!"Y".equals(retry)) return;
+            } catch (InvalidGradeException ige) {
+                System.out.println("\n✗ ERROR: InvalidGradeException");
+                System.out.println("  " + ige.getMessage());
+                System.out.println("  You entered: " + (gradeStr.isEmpty() ? ige.getValue() : gradeStr));
+                System.out.print("\nTry again? (Y/N): ");
+                String retry = scanner.nextLine().trim().toUpperCase();
+                if (!"Y".equals(retry)) return;
+            }
         }
-        if (gradeValue < 0 || gradeValue > 100) {
-            System.out.println("Invalid grade. Must be between 0 and 100.");
-            System.out.print("\nPress Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-        Grade grade = new Grade(studentId, subject, gradeValue);
+
+        // ----- 4) Confirmation and save (kept same flow you had) -----
+        Grade grade = new Grade(student.getStudentId(), subject, gradeValue);
+
         System.out.println("\nGRADE CONFIRMATION");
         System.out.println("─".repeat(70));
         System.out.println("Grade ID: " + grade.getGradeId());
@@ -236,21 +286,25 @@ public class Main {
         System.out.println("─".repeat(70));
         System.out.print("Confirm grade? (Y/N): ");
         String confirm = scanner.nextLine().trim().toUpperCase();
+
         if (confirm.equals("Y")) {
+            // (Preserved your current order)
             gradeManager.addGrade(grade);
             boolean ok = student.recordGrade(gradeValue);
             if (!ok) {
                 System.out.println("Grade could not be recorded (invalid or full).");
             } else {
                 student.enrollSubject(subject);
-                System.out.println("\nGrade recorded successfully!");
+                System.out.println("\n✓ Grade recorded successfully!");
             }
         } else {
             System.out.println("\nGrade entry canceled.");
         }
+
         System.out.print("\nPress Enter to continue...");
         scanner.nextLine();
-    }
+
+}
 
     private static void viewGradeReport(Scanner scanner, StudentManager studentManager, GradeManager gradeManager) {
         System.out.println("\nVIEW GRADE REPORT");
@@ -549,7 +603,6 @@ public class Main {
         System.out.println("─".repeat(40));
         double gpaSum = 0.0;
         for (Grade g : grades) {
-            double pct = g.getGrade();
             GPAMap map = toGPA(g.getGrade());
             System.out.printf("%-12s │ %5.0f%% │ %.1f (%s)%n",
                     g.getSubject().getSubjectName(), g.getGrade(), map.points, map.letter);
@@ -603,13 +656,7 @@ public class Main {
     // Helper structure for GPA mapping
 
     // Helper structure for GPA mapping
-    private static class GPAMap {
-        final double points;
-        final String letter;
-        GPAMap(double points, String letter) {
-            this.points = points;
-            this.letter = letter;
-        }
+        private record GPAMap(double points, String letter) {
     }
 
     /**
@@ -641,5 +688,578 @@ public class Main {
         return new GPAMap(0.0, "F");
     }
 
+
+    // BULK IMPORT GRADES - Load multiple grades from CSV file (./imports/<name>.csv)
+    private static void bulkImportGrades(Scanner scanner,
+                                         StudentManager studentManager,
+                                         GradeManager gradeManager) {
+        System.out.println("\nBULK IMPORT GRADES");
+        System.out.println("─".repeat(50));
+
+        // Where to place CSV
+        System.out.println("Place your CSV file in: ./imports/");
+        System.out.println();
+        System.out.println("CSV Format Required:");
+        System.out.println("StudentID,SubjectName,SubjectType,Grade");
+        System.out.println("Example: STU001,Mathematics,Core,85");
+        System.out.println();
+
+        // Ask for filename (without extension)
+        System.out.print("Enter filename (without extension): ");
+        String baseName = scanner.nextLine().trim();
+        if (baseName.isEmpty()) {
+            System.out.println("Filename cannot be empty.");
+            System.out.print("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        // Ensure ./imports exists
+        Path importsDir = Paths.get("./imports");
+        try {
+            if (!Files.exists(importsDir)) Files.createDirectories(importsDir);
+        } catch (IOException e) {
+            System.out.println("Failed to ensure imports directory: " + e.getMessage());
+            System.out.print("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        // Resolve CSV path
+        Path csvPath = importsDir.resolve(baseName + ".csv");
+
+        // Validate file
+        System.out.print("\nValidating file... ");
+        if (!Files.exists(csvPath) || !Files.isRegularFile(csvPath)) {
+            System.out.println("✗");
+            System.out.println("File not found: " + csvPath);
+            System.out.print("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        } else {
+            System.out.println("✓");
+        }
+
+        // Prepare log file
+        String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        Path logPath = importsDir.resolve("import_log_" + ts + ".txt");
+
+        System.out.println("Processing grades...");
+
+        int totalRows = 0;
+        int success = 0;
+        int failed = 0;
+        java.util.List<String> failures = new java.util.ArrayList<>();
+
+        // Read CSV
+        try (BufferedReader br = Files.newBufferedReader(csvPath, StandardCharsets.UTF_8);
+             BufferedWriter log = Files.newBufferedWriter(logPath, StandardCharsets.UTF_8)) {
+
+            String line;
+            int rowNum = 0;
+
+            while ((line = br.readLine()) != null) {
+                rowNum++;
+                line = line.trim();
+                if (line.isEmpty()) continue;
+
+                // Skip header automatically if present
+                if (rowNum == 1 && line.toLowerCase().startsWith("studentid,")) {
+                    continue;
+                }
+
+                totalRows++;
+
+                String[] parts = line.split(",", -1); // keep empty tokens
+                if (parts.length != 4) {
+                    failed++;
+                    String reason = "Row " + rowNum + ": Invalid column count (" + parts.length + ")";
+                    failures.add(reason);
+                    log.write(reason); log.newLine();
+                    continue;
+                }
+
+                String sid     = parts[0].trim().toUpperCase();
+                String subj    = parts[1].trim();
+                String type    = parts[2].trim();
+                String gradeStr= parts[3].trim();
+
+                // Validate student
+                Student student = studentManager.findStudent(sid);
+                if (student == null) {
+                    failed++;
+                    String reason = "Row " + rowNum + ": Invalid student ID (" + sid + ")";
+                    failures.add(reason);
+                    log.write(reason); log.newLine();
+                    continue;
+                }
+
+                // Validate subject type
+                boolean isCore = "Core".equalsIgnoreCase(type);
+                boolean isElective = "Elective".equalsIgnoreCase(type);
+                if (!isCore && !isElective) {
+                    failed++;
+                    String reason = "Row " + rowNum + ": Invalid subject type (" + type + ")";
+                    failures.add(reason);
+                    log.write(reason); log.newLine();
+                    continue;
+                }
+
+                // Parse and validate grade
+                double pct;
+                try {
+                    pct = Double.parseDouble(gradeStr);
+                } catch (NumberFormatException nfe) {
+                    failed++;
+                    String reason = "Row " + rowNum + ": Grade not a number (" + gradeStr + ")";
+                    failures.add(reason);
+                    log.write(reason); log.newLine();
+                    continue;
+                }
+                if (pct < 0 || pct > 100) {
+                    failed++;
+                    String reason = "Row " + rowNum + ": Grade out of range (" + gradeStr + ")";
+                    failures.add(reason);
+                    log.write(reason); log.newLine();
+                    continue;
+                }
+
+                // Build Subject instance
+                Subject subject = isCore
+                        ? new CoreSubject(subj, "C" + (int) (Math.random() * 1000))
+                        : new ElectiveSubject(subj, "E" + (int) (Math.random() * 1000));
+
+                // Create Grade and persist
+                Grade grade = new Grade(sid, subject, pct);
+                gradeManager.addGrade(grade);
+
+                // Record grade via Gradable
+                boolean ok = student.recordGrade(pct);
+                if (!ok) {
+                    failed++;
+                    String reason = "Row " + rowNum + ": Student grade storage full or invalid";
+                    failures.add(reason);
+                    log.write(reason); log.newLine();
+                    continue;
+                }
+
+                // Enroll subject (Set prevents duplicates)
+                student.enrollSubject(subject);
+
+                success++;
+            }
+
+            // Write end of log summary
+            log.newLine();
+            log.write("IMPORT SUMMARY"); log.newLine();
+            log.write("Total Rows: " + totalRows); log.newLine();
+            log.write("Successfully Imported: " + success); log.newLine();
+            log.write("Failed: " + failed); log.newLine();
+
+        } catch (IOException e) {
+            System.out.println("Import failed due to I/O error: " + e.getMessage());
+            System.out.print("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        // Render summary like screenshot
+        System.out.println();
+        System.out.println("IMPORT SUMMARY");
+        System.out.println("─".repeat(50));
+        System.out.println("Total Rows: " + totalRows);
+        System.out.println("Successfully Imported: " + success);
+        System.out.println("Failed: " + failed);
+
+        if (!failures.isEmpty()) {
+            System.out.println();
+            System.out.println("Failed Records:");
+            for (String f : failures) System.out.println(f);
+        }
+
+        System.out.println();
+        System.out.println("✓ Import completed!");
+        System.out.println(success + " grades added to system");
+        System.out.println("See " + logPath.getFileName() + " for details");
+
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    // VIEW CLASS STATISTICS - class-wide analytics (distribution, mean/median/mode/std dev, subject & type comparisons)
+    private static void viewClassStatistics(Scanner scanner,
+                                            StudentManager studentManager,
+                                            GradeManager gradeManager) {
+
+        System.out.println("\nCLASS STATISTICS");
+        System.out.println("─".repeat(60));
+
+        // Collect all grades
+        java.util.List<Grade> allGrades = new java.util.ArrayList<>();
+        for (int i = 0; i < gradeManager.getGradeCount(); i++) {
+            Grade g = gradeManager.getGradeAt(i);
+            if (g != null) allGrades.add(g);
+        }
+
+        int totalStudents = studentManager.getStudentCount();
+        int totalGrades = allGrades.size();
+
+        System.out.println("\nTotal Students: " + totalStudents);
+        System.out.println("Total Grades Recorded: " + totalGrades);
+
+        if (totalGrades == 0) {
+            System.out.println("\nNo grades in the system yet.");
+            System.out.print("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        // -------- Grade distribution (A/B/C/D/F bands) --------
+        int a = 0, b = 0, c = 0, d = 0, f = 0;
+        double min = 101, max = -1;
+        Grade minG = null, maxG = null;
+
+        for (Grade g : allGrades) {
+            double v = g.getGrade();
+            if (v > max) { max = v; maxG = g; }
+            if (v < min) { min = v; minG = g; }
+            if (v >= 90) a++;
+            else if (v >= 80) b++;
+            else if (v >= 70) c++;
+            else if (v >= 60) d++;
+            else f++;
+        }
+
+        System.out.println("\nGRADE DISTRIBUTION");
+        System.out.println("─".repeat(60));
+        printBand("90–100% (A):", a, totalGrades);
+        printBand("80–89%  (B):", b, totalGrades);
+        printBand("70–79%  (C):", c, totalGrades);
+        printBand("60–69%  (D):", d, totalGrades);
+        printBand("0–59%   (F):", f, totalGrades);
+
+        // -------- Statistical analysis --------
+        // Mean
+        double sum = 0.0;
+        for (Grade g : allGrades) sum += g.getGrade();
+        double mean = sum / totalGrades;
+
+        // Median
+        double[] arr = new double[totalGrades];
+        for (int i = 0; i < totalGrades; i++) arr[i] = allGrades.get(i).getGrade();
+        java.util.Arrays.sort(arr);
+        double median = (totalGrades % 2 == 1)
+                ? arr[totalGrades / 2]
+                : (arr[totalGrades / 2 - 1] + arr[totalGrades / 2]) / 2.0;
+
+        // Mode (most frequent whole-number grade; ties -> highest value)
+        java.util.Map<Integer, Integer> freq = new java.util.HashMap<>();
+        for (double v : arr) {
+            int r = (int) Math.round(v);
+            freq.put(r, freq.getOrDefault(r, 0) + 1);
+        }
+        int modeVal = -1, bestFreq = -1;
+        for (java.util.Map.Entry<Integer, Integer> e : freq.entrySet()) {
+            int val = e.getKey(), cnt = e.getValue();
+            if (cnt > bestFreq || (cnt == bestFreq && val > modeVal)) {
+                bestFreq = cnt; modeVal = val;
+            }
+        }
+
+        // Population Standard Deviation
+        double sq = 0.0;
+        for (double v : arr) sq += Math.pow(v - mean, 2);
+        double std = Math.sqrt(sq / totalGrades);
+
+        System.out.println("\nSTATISTICAL ANALYSIS");
+        System.out.println("─".repeat(60));
+        System.out.printf("Mean (Average):   %.1f%%%n", mean);
+        System.out.printf("Median:           %.1f%%%n", median);
+        System.out.printf("Mode:             %.1f%%%n", (double) modeVal);
+        System.out.printf("Standard Deviation: %.1f%%%n", std);
+        System.out.printf("Range:            %.1f%% (%.0f%% – %.0f%%)%n", (max - min), min, max);
+
+        // Highest/Lowest grade records
+        System.out.printf("%nHighest Grade: %.0f%% (%s - %s)%n",
+                maxG.getGrade(), maxG.getStudentId(), maxG.getSubject().getSubjectName());
+        System.out.printf("Lowest  Grade: %.0f%% (%s - %s)%n",
+                minG.getGrade(), minG.getStudentId(), minG.getSubject().getSubjectName());
+
+        // -------- Subject performance (Core/Elective + per subject) --------
+        double coreSum = 0, coreCnt = 0, elecSum = 0, elecCnt = 0;
+        java.util.Map<String, double[]> subjectAgg = new java.util.HashMap<>(); // name -> [sum, count]
+        for (Grade g : allGrades) {
+            String type = g.getSubject().getSubjectType();
+            if ("Core".equalsIgnoreCase(type)) { coreSum += g.getGrade(); coreCnt++; }
+            else if ("Elective".equalsIgnoreCase(type)) { elecSum += g.getGrade(); elecCnt++; }
+
+            String name = g.getSubject().getSubjectName();
+            double[] sc = subjectAgg.getOrDefault(name, new double[]{0.0, 0.0});
+            sc[0] += g.getGrade(); sc[1] += 1.0;
+            subjectAgg.put(name, sc);
+        }
+        double coreAvg = coreCnt == 0 ? 0.0 : coreSum / coreCnt;
+        double elecAvg = elecCnt == 0 ? 0.0 : elecSum / elecCnt;
+
+        System.out.println("\nSUBJECT PERFORMANCE");
+        System.out.println("─".repeat(60));
+        System.out.printf("Core Subjects:     %.1f%% average%n", coreAvg);
+        printSubjectAvg(subjectAgg, "Mathematics");
+        printSubjectAvg(subjectAgg, "English");
+        printSubjectAvg(subjectAgg, "Science");
+        System.out.println();
+        System.out.printf("Elective Subjects: %.1f%% average%n", elecAvg);
+        printSubjectAvg(subjectAgg, "Music");
+        printSubjectAvg(subjectAgg, "Art");
+        printSubjectAvg(subjectAgg, "Physical Education");
+
+        // -------- Student type comparison --------
+        // Include only students who have recorded at least one grade
+        java.util.Map<String, Integer> gradesPerStudent = new java.util.HashMap<>();
+        for (Grade g : allGrades) {
+            gradesPerStudent.put(g.getStudentId(), gradesPerStudent.getOrDefault(g.getStudentId(), 0) + 1);
+        }
+
+        double regSumAvg = 0.0; int regCount = 0;
+        double honSumAvg = 0.0; int honCount = 0;
+        for (Student s : studentManager.getStudents()) {
+            Integer scnt = gradesPerStudent.get(s.getStudentId());
+            if (scnt == null || scnt == 0) continue; // skip students with no grades
+            double avg = s.calculateAverageGrade();
+            if ("Regular".equalsIgnoreCase(s.getStudentType())) { regSumAvg += avg; regCount++; }
+            else if ("Honors".equalsIgnoreCase(s.getStudentType())) { honSumAvg += avg; honCount++; }
+        }
+
+        System.out.println("\nSTUDENT TYPE COMPARISON");
+        System.out.println("─".repeat(60));
+        System.out.printf("Regular Students: %.1f%% average (%d students)%n",
+                regCount == 0 ? 0.0 : regSumAvg / regCount, regCount);
+        System.out.printf("Honors Students:  %.1f%% average (%d students)%n",
+                honCount == 0 ? 0.0 : honSumAvg / honCount, honCount);
+
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    // ----- helpers for Class Statistics -----
+    private static void printBand(String label, int count, int total) {
+        double pct = total == 0 ? 0.0 : (count * 100.0 / total);
+        String bar = buildBar(count, total, 28); // 28-char bar to fit nicely
+        System.out.printf("%-13s %s  %4.1f%% (%d grades)%n", label, bar, pct, count);
+    }
+
+    private static String buildBar(int count, int total, int width) {
+        int filled = (total == 0) ? 0 : (int) Math.round((count * 1.0 / total) * width);
+        if (filled < 0) filled = 0; if (filled > width) filled = width;
+        String filledPart = "█".repeat(filled);
+        String emptyPart  = "░".repeat(width - filled);
+        return filledPart + emptyPart;
+    }
+
+    private static void printSubjectAvg(java.util.Map<String, double[]> agg, String subject) {
+        double[] sc = agg.get(subject);
+        if (sc != null && sc[1] > 0) {
+            double avg = sc[0] / sc[1];
+            System.out.printf("%s: %6.1f%%%s%n", subject, avg, "");
+        } else {
+            // If subject not present, you can omit the line or show 0.0%
+            // System.out.printf("%s: %6.1f%%%n", subject, 0.0);
+        }
+    }
+
+    // ======================= SEARCH STUDENTS (NEW) =======================
+    private static void searchStudents(Scanner scanner,
+                                       StudentManager studentManager,
+                                       GradeManager gradeManager) {
+
+        while (true) { // allows "New search" to loop
+            System.out.println("\nSEARCH STUDENTS");
+            System.out.println("─".repeat(50));
+
+            System.out.println("\nSearch options:");
+            System.out.println("1. By Student ID");
+            System.out.println("2. By Name (partial match)");
+            System.out.println("3. By Grade Range");
+            System.out.println("4. By Student Type");
+            System.out.print("\nSelect option (1-4): ");
+
+            int opt;
+            try {
+                opt = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid choice. Please enter 1-4.");
+                continue;
+            }
+            if (opt < 1 || opt > 4) {
+                System.out.println("Invalid choice. Please enter 1-4.");
+                continue;
+            }
+
+            // Gather results
+            java.util.List<Student> results = new java.util.ArrayList<>();
+            Student[] all = studentManager.getStudents();
+
+            switch (opt) {
+                case 1 -> {
+                    System.out.print("\nEnter ID (partial or full): ");
+                    String q = scanner.nextLine().trim().toUpperCase();
+                    for (Student s : all) {
+                        if (s.getStudentId().toUpperCase().contains(q)) results.add(s);
+                    }
+                }
+                case 2 -> {
+                    System.out.print("\nEnter name (partial or full): ");
+                    String q = scanner.nextLine().trim().toLowerCase();
+                    for (Student s : all) {
+                        if (s.getName().toLowerCase().contains(q)) results.add(s);
+                    }
+                }
+                case 3 -> {
+                    double min, max;
+                    try {
+                        System.out.print("\nEnter minimum average (0-100): ");
+                        min = Double.parseDouble(scanner.nextLine().trim());
+                        System.out.print("Enter maximum average (0-100): ");
+                        max = Double.parseDouble(scanner.nextLine().trim());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid number. Try again.");
+                        continue;
+                    }
+                    if (min > max) {
+                        double t = min; min = max; max = t; // swap
+                    }
+                    for (Student s : all) {
+                        double avg = s.calculateAverageGrade();
+                        if (avg >= min && avg <= max) results.add(s);
+                    }
+                }
+                case 4 -> {
+                    System.out.print("\nEnter type (Regular/Honors): ");
+                    String q = scanner.nextLine().trim();
+                    for (Student s : all) {
+                        if (s.getStudentType().equalsIgnoreCase(q)) results.add(s);
+                    }
+                }
+            }
+
+            printSearchResults(results);
+
+            // ---- Post-search actions ----
+            while (true) {
+                System.out.println("\nActions:");
+                System.out.println("1. View full details for a student");
+                System.out.println("2. Export search results");
+                System.out.println("3. New search");
+                System.out.println("4. Return to main menu");
+                System.out.print("\nEnter choice: ");
+
+                int action;
+                try {
+                    action = Integer.parseInt(scanner.nextLine().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid choice. Enter 1-4.");
+                    continue;
+                }
+
+                if (action == 1) {
+                    // Reuse your existing detailed report flow
+                    // (It will prompt for Student ID, which matches your current design.)
+                    viewGradeReport(scanner, studentManager, gradeManager);
+                } else if (action == 2) {
+                    exportSearchResults(results);
+                } else if (action == 3) {
+                    // new search -> break actions loop and restart search flow
+                    break;
+                } else if (action == 4) {
+                    // return to main menu
+                    return;
+                } else {
+                    System.out.println("Invalid choice. Enter 1-4.");
+                }
+            }
+        }
+    }
+
+    private static void printSearchResults(java.util.List<Student> results) {
+        System.out.println("\nSEARCH RESULTS (" + results.size() + " found)");
+        System.out.println("─".repeat(50));
+        System.out.printf("%-8s │ %-18s │ %-8s │ %-5s%n", "STU ID", "NAME", "TYPE", "AVG");
+        System.out.println("─".repeat(50));
+
+        if (results.isEmpty()) {
+            System.out.println("(no matches)");
+            System.out.println("─".repeat(50));
+            return;
+        }
+
+        for (Student s : results) {
+            System.out.printf("%-8s │ %-18s │ %-8s │ %5.1f%%%n",
+                    s.getStudentId(),
+                    truncateName(s.getName()),
+                    s.getStudentType(),
+                    s.calculateAverageGrade());
+        }
+        System.out.println("─".repeat(50));
+    }
+
+    private static void exportSearchResults(java.util.List<Student> results) {
+        // Ensure ./reports exists
+        Path reportsDir = Paths.get("./reports");
+        try {
+            if (!Files.exists(reportsDir)) Files.createDirectories(reportsDir);
+        } catch (IOException e) {
+            System.out.println("Failed to create reports directory: " + e.getMessage());
+            return;
+        }
+
+        String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        Path target = reportsDir.resolve("search_results_" + ts + ".txt");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(target.toFile()))) {
+            writer.write("SEARCH RESULTS (" + results.size() + " found)"); writer.newLine();
+            writer.write("─".repeat(50)); writer.newLine();
+            writer.write(String.format("%-8s │ %-18s │ %-8s │ %-5s", "STU ID", "NAME", "TYPE", "AVG")); writer.newLine();
+            writer.write("─".repeat(50)); writer.newLine();
+
+            for (Student s : results) {
+                writer.write(String.format("%-8s │ %-18s │ %-8s │ %5.1f%%",
+                        s.getStudentId(),
+                        truncateName(s.getName()),
+                        s.getStudentType(),
+                        s.calculateAverageGrade()));
+                writer.newLine();
+            }
+            writer.write("─".repeat(50)); writer.newLine();
+
+        } catch (IOException e) {
+            System.out.println("Failed to export search results: " + e.getMessage());
+            return;
+        }
+
+        long bytes = 0;
+        try { bytes = Files.size(target); } catch (IOException ignored) {}
+        String sizeText = String.format("%.1f KB", bytes / 1024.0);
+
+        System.out.println("\n✓ Search results exported!");
+        System.out.println(" File: " + target.getFileName());
+        System.out.println(" Location: ./reports/");
+        System.out.println(" Size: " + sizeText);
+    }
+
+    //Custom Exceptions
+    private static class StudentNotFoundException extends Exception {
+        public StudentNotFoundException(String id) {
+            super("Student with ID '" + id + "' not found in the system.");
+        }
+    }
+
+    private static class InvalidGradeException extends Exception {
+        private final double value;
+        public InvalidGradeException(double value) {
+            super("Grade must be between 0 and 100.");
+            this.value = value;
+        }
+        public double getValue() { return value; }
+    }
 
 }

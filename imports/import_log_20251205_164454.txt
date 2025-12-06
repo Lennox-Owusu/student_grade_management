@@ -1,0 +1,6 @@
+Row 1: Invalid column count (1)
+
+IMPORT SUMMARY
+Total Rows: 1
+Successfully Imported: 0
+Failed: 1
