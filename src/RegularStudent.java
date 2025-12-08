@@ -2,13 +2,14 @@
 public class RegularStudent extends Student {
 
     //Constructs a regular student with personal details.
-    public RegularStudent(String name, int age, String email, String phone) {
+    public RegularStudent(String name, int age, String email, String phone)
+    {
         super(name, age, email, phone);
     }
 
 
     @Override
-    public String getStudentType() { return "Regular"; }
+    public String getStudentType() { return "Regular Student"; }
 
     @Override
     public double getPassingGrade() {

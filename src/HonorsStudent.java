@@ -9,7 +9,7 @@ public class HonorsStudent extends Student {
 
 
     @Override
-    public String getStudentType() { return "Honors"; }
+    public String getStudentType() { return "Honors Student"; }
 
 
     //return the passing grade threshold for honors students (60%)
