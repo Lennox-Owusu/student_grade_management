@@ -4,7 +4,7 @@ public class HonorsStudent extends Student {
 
     //Constructs an honors student with personal details.
     public HonorsStudent(String name, int age, String email, String phone) {
-        super(name, age, email, phone);
+        super(name, age, email);
     }
 
 

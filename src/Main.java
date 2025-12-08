@@ -927,8 +927,10 @@ public class Main {
         System.out.printf("Range:            %.1f%% (%.0f%% – %.0f%%)%n", (max - min), min, max);
 
         // Highest/Lowest grade records
+        assert maxG != null;
         System.out.printf("%nHighest Grade: %.0f%% (%s - %s)%n",
                 maxG.getGrade(), maxG.getStudentId(), maxG.getSubject().getSubjectName());
+        assert minG != null;
         System.out.printf("Lowest  Grade: %.0f%% (%s - %s)%n",
                 minG.getGrade(), minG.getStudentId(), minG.getSubject().getSubjectName());
 
