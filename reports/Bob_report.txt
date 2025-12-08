@@ -2,15 +2,27 @@
 ║ EXPORT GRADE REPORT
 ╚══════════════════════════════════════════════════╝
 
-Student: STU001 - Alice Johnson
-Type: Regular
-Overall Average: 78.00%
-Enrolled Subjects: 1
-Passing Grade Threshold: 50%
+Student: STU002 - Bob Smith
+Type: Honors
+Overall Average: 62.00%
+Enrolled Subjects: 3
+Passing Grade Threshold: 60%
+Honors Eligible: No
+──────────────────────────────────────────────────────────────────────
+SUMMARY REPORT
+Total Grades: 3
+Core Subjects Average: 65.00%
+Elective Subjects Average: 56.00%
+Overall Average: 62.00%
+Performance Summary:
+ - Status: Passing
+ - Meets threshold (60%): Yes
 ──────────────────────────────────────────────────────────────────────
 DETAILED REPORT (All Grades)
 GRD ID   | DATE       | SUBJECT              | TYPE     | GRADE  
 ──────────────────────────────────────────────────────────────────────
-GRD1     | 2025-12-05 | Mathematics          | Core     | 78.00  
+GRD5     | 2025-12-08 | Science              | Core     | 32.00  
+GRD4     | 2025-12-08 | English              | Core     | 98.00  
+GRD3     | 2025-12-08 | Art                  | Elective | 56.00  
 ──────────────────────────────────────────────────────────────────────
-Total Grades: 1
+Total Grades: 3

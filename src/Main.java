@@ -1,5 +1,3 @@
-
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.BufferedReader;
 import java.util.Scanner;
-
 
 public class Main {
     public static void main(String[] args) {
@@ -67,11 +64,11 @@ public class Main {
     }
 
     private static void preloadSampleStudents(StudentManager studentManager) {
-        studentManager.addStudent(new RegularStudent("Alice Johnson", 16, "alice@school.edu", "555-1111"));
-        studentManager.addStudent(new HonorsStudent("Bob Smith", 17, "bob@school.edu", "555-2222"));
-        studentManager.addStudent(new RegularStudent("Carol Martinez", 15, "carol@school.edu", "555-3333"));
-        studentManager.addStudent(new HonorsStudent("David Chen", 18, "david@school.edu", "555-4444"));
-        studentManager.addStudent(new RegularStudent("Emma Wilson", 16, "emma@school.edu", "555-5555"));
+        studentManager.addStudent(new RegularStudent("Alice Johnson", 16, "alice@school.edu", "0241108345"));
+        studentManager.addStudent(new HonorsStudent("Bob Smith", 17, "bob@school.edu", "0256521345"));
+        studentManager.addStudent(new RegularStudent("Carol Martinez", 15, "carol@school.edu", "0545678345"));
+        studentManager.addStudent(new HonorsStudent("David Chen", 18, "david@school.edu", "0536789435"));
+        studentManager.addStudent(new RegularStudent("Emma Wilson", 16, "emma@school.edu", "0237896072"));
     }
 
     private static void addStudent(Scanner scanner, StudentManager studentManager) {
@@ -122,23 +119,23 @@ public class Main {
             return;
         }
         System.out.println("\nSTUDENT LISTING");
-        System.out.println("─".repeat(70));
-        System.out.printf("%-8s \n %-18s \n %-8s \n %-10s \n %-8s%n",
+        System.out.println("─".repeat(80));
+        System.out.printf("%-8s | %-18s | %-8s | %-10s | %-8s%n",
                 "STU ID", "NAME", "TYPE", "AVG GRADE", "STATUS");
-        System.out.println("─".repeat(70));
+        System.out.println("─".repeat(80));
         for (Student s : studentManager.getStudents()) {
             System.out.printf("%-8s │ %-18s │ %-8s │ %-10.2f │ %-8s%n",
                     s.getStudentId(), truncateName(s.getName()), s.getStudentType(),
                     s.calculateAverageGrade(), (s.isPassing() ? "Passing" : "Failing"));
             if ("Honors".equals(s.getStudentType())) {
                 boolean eligible = (s instanceof HonorsStudent) && ((HonorsStudent) s).checkHonorsEligibility();
-                System.out.printf(" Enrolled Subjects: %d \n Passing Grade: %.0f%% \n Honors Eligible: %s%n",
+                System.out.printf("        Enrolled Subjects: %d | Passing Grade: %.0f%% |     Honors Eligible: %s%n",
                         s.getEnrolledSubjectCount(), s.getPassingGrade(), (eligible ? "Yes" : "No"));
             } else {
-                System.out.printf(" Enrolled Subjects: %d \n Passing Grade: %.0f%%%n",
+                System.out.printf("        Enrolled Subjects: %d | Passing Grade: %.0f%%%n",
                         s.getEnrolledSubjectCount(), s.getPassingGrade());
             }
-            System.out.println("─".repeat(70));
+            System.out.println("─".repeat(80));
         }
         System.out.println("Total Students: " + studentManager.getStudentCount());
         System.out.printf("Average Class Grade: %.2f%n", studentManager.getAverageClassGrade());
@@ -154,9 +151,7 @@ public class Main {
     private static void recordGrade(Scanner scanner, StudentManager studentManager, GradeManager gradeManager) {
         System.out.println("\nRECORD GRADE");
         System.out.println("─".repeat(40));
-
-        // ----- 1) Prompt for student ID with exception flow -----
-        Student student = null;
+        Student student;
         Subject subject;
         while (true) {
             System.out.print("\nEnter Student ID: ");
@@ -166,18 +161,15 @@ public class Main {
             try {
                 student = studentManager.findStudent(studentId);
                 if (student == null) throw new StudentNotFoundException(studentId);
-                // Found -> proceed
-                // Show student details (like your previous version)
                 System.out.println("\nStudent Details:");
                 System.out.println("Name: " + student.getName());
                 System.out.println("Type: " + student.getStudentType());
                 System.out.printf("Current Average: %.2f%n", student.calculateAverageGrade());
-                break; // exit the "find student" loop
+                break;
             } catch (StudentNotFoundException snfe) {
                 System.out.println("\n✗ ERROR: StudentNotFoundException");
                 System.out.println("  " + snfe.getMessage());
                 System.out.println();
-                // Show available IDs on one line, comma separated
                 Student[] all = studentManager.getStudents();
                 StringBuilder ids = new StringBuilder("  Available student IDs: ");
                 for (int i = 0; i < all.length; i++) {
@@ -187,11 +179,11 @@ public class Main {
                 System.out.println(ids);
                 System.out.print("\nTry again? (Y/N): ");
                 String retry = scanner.nextLine().trim().toUpperCase();
-                if (!"Y".equals(retry)) return; // back to main menu
+                if (!"Y".equals(retry)) return;
             }
         }
 
-        // ----- 2) Subject type & picking (exactly like your current UI) -----
+
         System.out.println("\nSubject type:");
         System.out.println("1. Core Subject (Mathematics, English, Science)");
         System.out.println("2. Elective Subject (Music, Art ,Physical Education)");
@@ -246,7 +238,7 @@ public class Main {
             return;
         }
 
-        // ----- 3) Enter grade with exception flow and retry -----
+
         double gradeValue;
         while (true) {
             System.out.print("\nEnter grade (0-100): ");
@@ -273,7 +265,7 @@ public class Main {
             }
         }
 
-        // ----- 4) Confirmation and save (kept same flow you had) -----
+
         Grade grade = new Grade(student.getStudentId(), subject, gradeValue);
 
         System.out.println("\nGRADE CONFIRMATION");
@@ -288,7 +280,6 @@ public class Main {
         String confirm = scanner.nextLine().trim().toUpperCase();
 
         if (confirm.equals("Y")) {
-            // (Preserved your current order)
             gradeManager.addGrade(grade);
             boolean ok = student.recordGrade(gradeValue);
             if (!ok) {
@@ -365,12 +356,10 @@ public class Main {
     }
 
 
-    // EXPORT GRADE REPORT (Summary / Detailed / Both) -> writes to ./reports/<filename>.txt
     private static void exportGradeReport(Scanner scanner, StudentManager studentManager, GradeManager gradeManager) {
         System.out.println("\nEXPORT GRADE REPORT");
         System.out.println("─".repeat(50));
 
-        // 1) Ask for Student ID
         System.out.print("Enter Student ID: ");
         String inputId = scanner.nextLine().trim();
         String studentId = inputId.toUpperCase();
@@ -383,7 +372,7 @@ public class Main {
             return;
         }
 
-        // 2) Gather grades for the student
+        //Gather grades for the student
         java.util.ArrayList<Grade> list = new java.util.ArrayList<>();
         for (int i = 0; i < gradeManager.getGradeCount(); i++) {
             Grade g = gradeManager.getGradeAt(i);
@@ -392,20 +381,17 @@ public class Main {
             }
         }
 
-        // Display student summary like the screenshot
         System.out.println();
         System.out.println("Student: " + student.getStudentId() + " - " + student.getName());
         System.out.println("Type: " + student.getStudentType());
         System.out.println("Total Grades: " + list.size());
         System.out.println();
 
-        // If no grades, still allow summary export but warn
         if (list.isEmpty()) {
             System.out.println("NOTE: No grades recorded for this student yet.");
             System.out.println();
         }
 
-        // 3) Export options
         System.out.println("Export options:");
         System.out.println("1. Summary Report (overview only)");
         System.out.println("2. Detailed Report (all grades)");
@@ -427,12 +413,10 @@ public class Main {
             return;
         }
 
-        // 4) Ask for filename (without extension)
         System.out.print("\nEnter filename (without extension): ");
         String baseName = scanner.nextLine().trim();
         if (baseName.isEmpty()) baseName = student.getName().toLowerCase().replaceAll("\\s+", "_") + "_report";
 
-        // 5) Ensure ./reports/ directory
         Path reportsDir = Paths.get("./reports");
         try {
             if (!Files.exists(reportsDir)) Files.createDirectories(reportsDir);
@@ -443,18 +427,16 @@ public class Main {
             return;
         }
 
-        // 6) Build target path
         String filename = baseName + ".txt";
         Path target = reportsDir.resolve(filename);
 
-        // 7) Compute aggregates (used by summary and detailed)
+        // 7) Compute aggregates
         double coreAvg = gradeManager.calculateCoreAverage(studentId);
         double elecAvg = gradeManager.calculateElectiveAverage(studentId);
         double overallAvg = gradeManager.calculateOverallAverage(studentId);
         boolean passing = student.isPassing();
         boolean honorsEligible = (student instanceof HonorsStudent) && ((HonorsStudent) student).checkHonorsEligibility();
 
-        // 8) Write file
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(target.toFile()))) {
 
             // Header block
@@ -484,7 +466,7 @@ public class Main {
             writer.write("─".repeat(70));
             writer.newLine();
 
-            // Summary section (option 1 or 3)
+            // Summary section
             if (exportChoice == 1 || exportChoice == 3) {
                 writer.write("SUMMARY REPORT");
                 writer.newLine();
@@ -506,7 +488,7 @@ public class Main {
                 writer.newLine();
             }
 
-            // Detailed table (option 2 or 3)
+            // Detailed table
             if (exportChoice == 2 || exportChoice == 3) {
                 writer.write("DETAILED REPORT (All Grades)");
                 writer.newLine();
@@ -516,7 +498,6 @@ public class Main {
                 writer.write("─".repeat(70));
                 writer.newLine();
 
-                // latest first (like your view)
                 for (int i = list.size() - 1; i >= 0; i--) {
                     Grade g = list.get(i);
                     writer.write(String.format("%-8s | %-10s | %-20s | %-8s | %-7.2f",
@@ -536,9 +517,8 @@ public class Main {
             return;
         }
 
-        // 9) Post-write info: size, location, contents text
 
-// 9) Post-write info: size, location, contents text (show number of grades recorded)
+        //show number of grades recorded
         long bytes = 0L;
         try {
             bytes = Files.size(target);
@@ -546,19 +526,16 @@ public class Main {
         }
 
         String sizeText = String.format("%.1f KB", bytes / 1024.0);
-        int gradeCount = list.size(); // number of grades recorded for this student
+        int gradeCount = list.size();
 
         System.out.println("\n✓ Report exported successfully!");
         System.out.println("  File: " + target.getFileName());
         System.out.println("  Location: ./reports/");
         System.out.println("  Size: " + sizeText);
 
-// Build 'Contains' line based on export option
         if (exportChoice == 1) {
-            // Summary only (no grade rows)
             System.out.println("  Contains: overview only, averages, performance summary");
         } else {
-            // Detailed or Both -> show exact number of grade records
             System.out.println("  Contains: " + gradeCount + " grades, averages, performance summary");
         }
 
@@ -566,7 +543,7 @@ public class Main {
         scanner.nextLine();
     }
 
-        // NEW: Calculate Student GPA (4.0 scale)
+
     private static void calculateStudentGPA(Scanner scanner, StudentManager studentManager, GradeManager gradeManager) {
         System.out.println("\nCALCULATE STUDENT GPA");
         System.out.println("─".repeat(50));
@@ -634,7 +611,7 @@ public class Main {
         }
         int rank = 1;
         for (double other : gpas) {
-            if (other > cumulativeGpa) rank++; // higher GPA ranks above
+            if (other > cumulativeGpa) rank++;
         }
         System.out.println();
         System.out.printf("Cumulative GPA: %.2f / 4.0%n", cumulativeGpa);
@@ -653,27 +630,10 @@ public class Main {
         scanner.nextLine();
     }
 
-    // Helper structure for GPA mapping
 
-    // Helper structure for GPA mapping
         private record GPAMap(double points, String letter) {
     }
 
-    /**
-     * Convert percentage to 4.0 GPA points + letter grade
-     * Grading Scale:
-     * 93–100%: 4.0 (A)
-     * 90–92% : 3.7 (A-)
-     * 87–89% : 3.3 (B+)
-     * 83–86% : 3.0 (B)
-     * 80–82% : 2.7 (B-)
-     * 77–79% : 2.3 (C+)
-     * 73–76% : 2.0 (C)
-     * 70–72% : 1.7 (C-)
-     * 67–69% : 1.3 (D+)
-     * 60–66% : 1.0 (D)
-     * < 60%  : 0.0 (F)
-     */
     private static GPAMap toGPA(double pct) {
         if (pct >= 93) return new GPAMap(4.0, "A");
         if (pct >= 90) return new GPAMap(3.7, "A-");
@@ -689,14 +649,12 @@ public class Main {
     }
 
 
-    // BULK IMPORT GRADES - Load multiple grades from CSV file (./imports/<name>.csv)
     private static void bulkImportGrades(Scanner scanner,
                                          StudentManager studentManager,
                                          GradeManager gradeManager) {
         System.out.println("\nBULK IMPORT GRADES");
         System.out.println("─".repeat(50));
 
-        // Where to place CSV
         System.out.println("Place your CSV file in: ./imports/");
         System.out.println();
         System.out.println("CSV Format Required:");
@@ -704,7 +662,6 @@ public class Main {
         System.out.println("Example: STU001,Mathematics,Core,85");
         System.out.println();
 
-        // Ask for filename (without extension)
         System.out.print("Enter filename (without extension): ");
         String baseName = scanner.nextLine().trim();
         if (baseName.isEmpty()) {
@@ -714,7 +671,6 @@ public class Main {
             return;
         }
 
-        // Ensure ./imports exists
         Path importsDir = Paths.get("./imports");
         try {
             if (!Files.exists(importsDir)) Files.createDirectories(importsDir);
@@ -725,10 +681,8 @@ public class Main {
             return;
         }
 
-        // Resolve CSV path
         Path csvPath = importsDir.resolve(baseName + ".csv");
 
-        // Validate file
         System.out.print("\nValidating file... ");
         if (!Files.exists(csvPath) || !Files.isRegularFile(csvPath)) {
             System.out.println("✗");
@@ -763,7 +717,6 @@ public class Main {
                 line = line.trim();
                 if (line.isEmpty()) continue;
 
-                // Skip header automatically if present
                 if (rowNum == 1 && line.toLowerCase().startsWith("studentid,")) {
                     continue;
                 }
@@ -824,12 +777,10 @@ public class Main {
                     continue;
                 }
 
-                // Build Subject instance
                 Subject subject = isCore
                         ? new CoreSubject(subj, "C" + (int) (Math.random() * 1000))
                         : new ElectiveSubject(subj, "E" + (int) (Math.random() * 1000));
 
-                // Create Grade and persist
                 Grade grade = new Grade(sid, subject, pct);
                 gradeManager.addGrade(grade);
 
@@ -843,13 +794,11 @@ public class Main {
                     continue;
                 }
 
-                // Enroll subject (Set prevents duplicates)
                 student.enrollSubject(subject);
 
                 success++;
             }
 
-            // Write end of log summary
             log.newLine();
             log.write("IMPORT SUMMARY"); log.newLine();
             log.write("Total Rows: " + totalRows); log.newLine();
@@ -863,7 +812,6 @@ public class Main {
             return;
         }
 
-        // Render summary like screenshot
         System.out.println();
         System.out.println("IMPORT SUMMARY");
         System.out.println("─".repeat(50));
@@ -886,7 +834,6 @@ public class Main {
         scanner.nextLine();
     }
 
-    // VIEW CLASS STATISTICS - class-wide analytics (distribution, mean/median/mode/std dev, subject & type comparisons)
     private static void viewClassStatistics(Scanner scanner,
                                             StudentManager studentManager,
                                             GradeManager gradeManager) {
@@ -914,7 +861,7 @@ public class Main {
             return;
         }
 
-        // -------- Grade distribution (A/B/C/D/F bands) --------
+        //Grade distribution
         int a = 0, b = 0, c = 0, d = 0, f = 0;
         double min = 101, max = -1;
         Grade minG = null, maxG = null;
@@ -938,7 +885,7 @@ public class Main {
         printBand("60–69%  (D):", d, totalGrades);
         printBand("0–59%   (F):", f, totalGrades);
 
-        // -------- Statistical analysis --------
+        //Statistical analysis
         // Mean
         double sum = 0.0;
         for (Grade g : allGrades) sum += g.getGrade();
@@ -952,7 +899,7 @@ public class Main {
                 ? arr[totalGrades / 2]
                 : (arr[totalGrades / 2 - 1] + arr[totalGrades / 2]) / 2.0;
 
-        // Mode (most frequent whole-number grade; ties -> highest value)
+        // Mode
         java.util.Map<Integer, Integer> freq = new java.util.HashMap<>();
         for (double v : arr) {
             int r = (int) Math.round(v);
@@ -985,7 +932,7 @@ public class Main {
         System.out.printf("Lowest  Grade: %.0f%% (%s - %s)%n",
                 minG.getGrade(), minG.getStudentId(), minG.getSubject().getSubjectName());
 
-        // -------- Subject performance (Core/Elective + per subject) --------
+        //Subject performance
         double coreSum = 0, coreCnt = 0, elecSum = 0, elecCnt = 0;
         java.util.Map<String, double[]> subjectAgg = new java.util.HashMap<>(); // name -> [sum, count]
         for (Grade g : allGrades) {
@@ -1013,8 +960,7 @@ public class Main {
         printSubjectAvg(subjectAgg, "Art");
         printSubjectAvg(subjectAgg, "Physical Education");
 
-        // -------- Student type comparison --------
-        // Include only students who have recorded at least one grade
+        //Student type comparison
         java.util.Map<String, Integer> gradesPerStudent = new java.util.HashMap<>();
         for (Grade g : allGrades) {
             gradesPerStudent.put(g.getStudentId(), gradesPerStudent.getOrDefault(g.getStudentId(), 0) + 1);
@@ -1041,10 +987,10 @@ public class Main {
         scanner.nextLine();
     }
 
-    // ----- helpers for Class Statistics -----
+    //helpers for Class Statistics
     private static void printBand(String label, int count, int total) {
         double pct = total == 0 ? 0.0 : (count * 100.0 / total);
-        String bar = buildBar(count, total, 28); // 28-char bar to fit nicely
+        String bar = buildBar(count, total, 28);
         System.out.printf("%-13s %s  %4.1f%% (%d grades)%n", label, bar, pct, count);
     }
 
@@ -1062,17 +1008,15 @@ public class Main {
             double avg = sc[0] / sc[1];
             System.out.printf("%s: %6.1f%%%s%n", subject, avg, "");
         } else {
-            // If subject not present, you can omit the line or show 0.0%
-            // System.out.printf("%s: %6.1f%%%n", subject, 0.0);
+            System.out.printf("%s: %6.1f%%%n", subject, 0.0);
         }
     }
 
-    // ======================= SEARCH STUDENTS (NEW) =======================
+
     private static void searchStudents(Scanner scanner,
                                        StudentManager studentManager,
                                        GradeManager gradeManager) {
-
-        while (true) { // allows "New search" to loop
+        while (true) {
             System.out.println("\nSEARCH STUDENTS");
             System.out.println("─".repeat(50));
 
@@ -1126,7 +1070,7 @@ public class Main {
                         continue;
                     }
                     if (min > max) {
-                        double t = min; min = max; max = t; // swap
+                        double t = min; min = max; max = t;
                     }
                     for (Student s : all) {
                         double avg = s.calculateAverageGrade();
@@ -1144,7 +1088,6 @@ public class Main {
 
             printSearchResults(results);
 
-            // ---- Post-search actions ----
             while (true) {
                 System.out.println("\nActions:");
                 System.out.println("1. View full details for a student");
@@ -1162,16 +1105,12 @@ public class Main {
                 }
 
                 if (action == 1) {
-                    // Reuse your existing detailed report flow
-                    // (It will prompt for Student ID, which matches your current design.)
                     viewGradeReport(scanner, studentManager, gradeManager);
                 } else if (action == 2) {
                     exportSearchResults(results);
                 } else if (action == 3) {
-                    // new search -> break actions loop and restart search flow
                     break;
                 } else if (action == 4) {
-                    // return to main menu
                     return;
                 } else {
                     System.out.println("Invalid choice. Enter 1-4.");
@@ -1246,7 +1185,6 @@ public class Main {
         System.out.println(" Size: " + sizeText);
     }
 
-    //Custom Exceptions
     private static class StudentNotFoundException extends Exception {
         public StudentNotFoundException(String id) {
             super("Student with ID '" + id + "' not found in the system.");
