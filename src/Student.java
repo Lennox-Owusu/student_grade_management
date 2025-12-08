@@ -16,7 +16,7 @@ public abstract class Student implements Gradable {
     private static int studentCounter = 0;
 
     //Constructs a student with personal details and initializes grade storage.
-    public Student(String name, int age, String email, String phone) {
+    public Student(String name, int age, String email) {
         this.studentId = String.format("STU%03d", ++studentCounter);
         this.name = name;
         this.age = age;

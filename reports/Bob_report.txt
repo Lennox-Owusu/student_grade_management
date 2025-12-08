@@ -1,0 +1,28 @@
+╔══════════════════════════════════════════════════╗
+║ EXPORT GRADE REPORT
+╚══════════════════════════════════════════════════╝
+
+Student: STU002 - Bob Smith
+Type: Honors
+Overall Average: 62.00%
+Enrolled Subjects: 3
+Passing Grade Threshold: 60%
+Honors Eligible: No
+──────────────────────────────────────────────────────────────────────
+SUMMARY REPORT
+Total Grades: 3
+Core Subjects Average: 65.00%
+Elective Subjects Average: 56.00%
+Overall Average: 62.00%
+Performance Summary:
+ - Status: Passing
+ - Meets threshold (60%): Yes
+──────────────────────────────────────────────────────────────────────
+DETAILED REPORT (All Grades)
+GRD ID   | DATE       | SUBJECT              | TYPE     | GRADE  
+──────────────────────────────────────────────────────────────────────
+GRD5     | 2025-12-08 | Science              | Core     | 32.00  
+GRD4     | 2025-12-08 | English              | Core     | 98.00  
+GRD3     | 2025-12-08 | Art                  | Elective | 56.00  
+──────────────────────────────────────────────────────────────────────
+Total Grades: 3

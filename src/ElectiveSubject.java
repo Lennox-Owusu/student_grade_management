@@ -11,6 +11,7 @@ public class ElectiveSubject extends Subject {
     //@return "Elective" to identify the subject type.
     @Override
     public String getSubjectType() {
+
         return "Elective";
     }
 

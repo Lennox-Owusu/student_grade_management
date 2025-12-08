@@ -1,0 +1,17 @@
+╔══════════════════════════════════════════════════╗
+║ EXPORT GRADE REPORT
+╚══════════════════════════════════════════════════╝
+
+Student: STU001 - Alice Johnson
+Type: Regular
+Overall Average: 61.50%
+Enrolled Subjects: 2
+Passing Grade Threshold: 50%
+──────────────────────────────────────────────────────────────────────
+DETAILED REPORT (All Grades)
+GRD ID   | DATE       | SUBJECT              | TYPE     | GRADE  
+──────────────────────────────────────────────────────────────────────
+GRD2     | 2025-12-05 | Music                | Elective | 45.00  
+GRD1     | 2025-12-05 | Mathematics          | Core     | 78.00  
+──────────────────────────────────────────────────────────────────────
+Total Grades: 2

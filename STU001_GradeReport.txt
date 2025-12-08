@@ -1,0 +1,18 @@
+╔══════════════════════════════════════════════════╗
+STUDENT GRADE REPORT - STU001
+╚══════════════════════════════════════════════════╝
+Name: Alice Johnson
+Type: Regular
+Current Average: 34.00
+Status: Failing
+Enrolled Subjects: 1
+Passing Grade Threshold: 50%
+──────────────────────────────────────────────────────────────────────
+GRD ID   | DATE       | SUBJECT              | TYPE     | GRADE  
+──────────────────────────────────────────────────────────────────────
+GRD1     | 2025-12-05 | Mathematics          | Core     | 34.00  
+──────────────────────────────────────────────────────────────────────
+Total Grades: 1
+Core Subjects Average: 34.00
+Elective Subjects Average: 0.00
+Overall Average: 34.00
