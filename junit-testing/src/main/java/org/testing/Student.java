@@ -1,3 +1,5 @@
+package org.testing;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -73,4 +75,12 @@ public abstract class Student implements Gradable {
     public String getEmail() { return email; }
 
 
+    public boolean recordGrade(CoreSubject math, double v) {
+        return false;
+    }
+
+    public boolean passed(CoreSubject sci) {
+        return false;
+    }
 }
+
