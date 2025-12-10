@@ -31,16 +31,26 @@ public abstract class Student implements Gradable {
     public abstract double getPassingGrade();
 
     // Implement Gradable interface
-    @Override
-    public boolean recordGrade(double grade) {
-        if (validateGrade(grade)) {
-            if (gradeCount < grades.length) {
-                grades[gradeCount++] = grade;
-                return true;
-            }
+
+    // In Student (or RegularStudent if overridden)
+    public boolean recordGrade(Subject subject, double grade) {
+        if (subject == null) {
+            throw new IllegalArgumentException("subject must not be null");
         }
-        return false;
+        if (Double.isNaN(grade) || grade < 0.0 || grade > 100.0) {
+            throw new IllegalArgumentException("grade must be between 0 and 100");
+        }
+
+        // If you maintain per-student grade array:
+        if (gradeCount >= grades.length) {
+            throw new IllegalStateException("Grade capacity reached");
+        }
+        grades[gradeCount++] = grade;
+
+        enrolledSubjectCodes.add(subject.getSubjectCode());
+        return true;
     }
+
 
     @Override
     public boolean validateGrade(double grade) {
