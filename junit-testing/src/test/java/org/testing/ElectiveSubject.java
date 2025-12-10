@@ -16,7 +16,6 @@ class ElectiveSubjectTest {
     @Test
     void subjectType_isElective() {
         ElectiveSubject art = new ElectiveSubject("Visual Arts", "ART201");
-        // Adjust expected if your implementation uses a different label
         assertEquals("Elective", art.getSubjectType());
     }
 
