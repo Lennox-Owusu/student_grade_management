@@ -58,8 +58,6 @@ class HonorsStudentTest {
     void recordGrade_rejectsInvalidValues_ifStudentRecordGradeValidates() {
         HonorsStudent hs = new HonorsStudent("Kojo Asare", 25, "kojo@example.com", "0240000006");
 
-        // If your Student.recordGrade(double) returns false for invalid inputs, these assertions will pass.
-        // If instead it throws IllegalArgumentException, change these to assertThrows accordingly.
         assertFalse(hs.recordGrade(-1),   "Negative grade should be rejected");
         assertFalse(hs.recordGrade(101),  "Grade > 100 should be rejected");
         assertFalse(hs.recordGrade(Double.NaN), "NaN grade should be rejected");
