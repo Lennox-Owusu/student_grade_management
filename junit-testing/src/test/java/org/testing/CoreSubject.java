@@ -13,13 +13,17 @@ class CoreSubjectTest {
         assertEquals("MATH101", math.getSubjectCode());
     }
 
-//    @Test
-//    void rejectsNullOrBlankValues_ifValidatedInConstructor() {
-       //test passed- couldn't validate null entry
-//        assertThrows(IllegalArgumentException.class, () -> new CoreSubject(null, "MATH101"));
-//        assertThrows(IllegalArgumentException.class, () -> new CoreSubject("Mathematics", null));
-//        assertThrows(IllegalArgumentException.class, () -> new CoreSubject("", "MATH101"));
-//        assertThrows(IllegalArgumentException.class, () -> new CoreSubject("Mathematics", "  "));
-//    }
-}
+    @Test
+    void subjectType_isCore() {
+        CoreSubject math = new CoreSubject("Mathematics", "MATH101");
+        assertEquals("Core", math.getSubjectType());
+    }
 
+    @Test
+    void rejectsNullOrBlankValues_viaBaseSubjectValidation() {
+        assertThrows(IllegalArgumentException.class, () -> new CoreSubject(null, "MATH101"));
+        assertThrows(IllegalArgumentException.class, () -> new CoreSubject("Mathematics", null));
+        assertThrows(IllegalArgumentException.class, () -> new CoreSubject("", "MATH101"));
+        assertThrows(IllegalArgumentException.class, () -> new CoreSubject("Mathematics", "   "));
+    }
+}
